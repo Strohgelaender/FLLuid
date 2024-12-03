@@ -14,7 +14,7 @@ socket.on("set-state", newState => {
         display_state.images.forEach(img => tmp += generate_item(img));
         document.querySelector("#logoCarousel > .carousel-inner").innerHTML = tmp;
         // apply the 'active' class to the first image to start the slideshow
-        document.querySelector("#logoCarousel > .carousel-inner > .carousel-item").classList.add("active");
+        document.querySelector("#logoCarousel > .carousel-inner > .carousel-item")?.classList.add("active");
     }
 
     if (old_state.image_time != display_state.image_time){

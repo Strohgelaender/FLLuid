@@ -35,7 +35,7 @@ class Scrollable{
 
     /**
      * Update the specified options
-     * @param {Object} options 
+     * @param {Object} options
      */
     updateOptions(options, start=true){
         this.speed = options.hasOwnProperty("speed") ? options.speed : this.speed;
@@ -84,7 +84,7 @@ class Scrollable{
     /**
      * Start scrolling
      */
-    start(){        
+    start(){
 
         this._last_time = Date.now();
         this.stop();
@@ -185,7 +185,7 @@ class Scrollable{
             }
 
         }
-    
+
     }
 
     /**
@@ -198,19 +198,19 @@ class Scrollable{
                 let header = document.createElement("table");
                 header.className = `scrollable-sticky-header ${this.extraClasses}`;
                 header.style.margin = 0;
-    
+
                 //build the initial list of headers
                 // let th_list = this.scrollable_container.querySelectorAll("th");
-                let th_list = this.scrollable_container.querySelector(".scrollable-table").querySelectorAll("th");
+                let th_list = this.scrollable_container.querySelector(".scrollable-table")?.querySelectorAll("th");
                 let header_row = document.createElement("tr")
-                th_list.forEach(item => {
+                th_list?.forEach(item => {
                     let tmp = document.createElement("th");
                     tmp.innerHTML = item.innerHTML;
                     tmp.style.width = item.offsetWidth + 'px';
                     header_row.append(tmp);
                 });
                 header.append(header_row);
-    
+
                 this.sticky_headers_area.innerHTML = header.outerHTML;
             }
             else{

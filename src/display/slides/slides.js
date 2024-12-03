@@ -23,6 +23,9 @@ socket.on("set-state", newState => {
 
 function show_slide(slide, chroma){
     let tmp = "";
+    if (!slide){
+        return;
+    }
     switch (slide.slide_type){
         case "speaker":
             if (chroma){
@@ -58,7 +61,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(location.search);
     if (urlParams.get("dark") >= 1){
         // dark mode
-        
+
         if (window.location.pathname == "/slides-chroma"){
             document.querySelector(".slides-disp-chroma").classList.add("dark", "text-light");
         }
