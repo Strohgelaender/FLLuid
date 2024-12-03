@@ -5,6 +5,8 @@ socket.on('connect', () => {
 
 var display_state = {};
 
+// TODO highlight current match, remove old matches
+
 function array_cmp(a1, a2){
     return JSON.stringify(a1) === JSON.stringify(a2);
 }
@@ -15,11 +17,11 @@ socket.on("set-state", newState => {
 
     if (!array_cmp(old_state.match_blocks, display_state.match_blocks) ||
         (old_state.current_block != display_state.current_block)){
-        let tmp = [["Time", "Team #", "Team Name", "Table", "Type", "Round"]];
+        let tmp = [["Uhrzeit", "Team", "Tisch", "Runde"]];
         display_state.match_blocks.forEach((block, idx) => {
             if (idx >= display_state.current_block){
                 block.matches.forEach(match => {
-                    tmp.push([block.time, match.team, match.name, match.table, match.type, match.round]);
+                    tmp.push([block.time, match.name, match.table, match.type === 'Practice' ? 'TR': match.round]);
                 });
             }
         });

@@ -18,7 +18,7 @@ function make_request(url, handler_function, next_step){
 
     needle.post(encodeURI(url), '', headers, function(error, response, body){
         if (error === null){
-            //if request returned without error, call the 
+            //if request returned without error, call the
             //handler function with the result body
             handler_function(body, next_step);
         }
@@ -104,8 +104,14 @@ function team_name_extractor(body, next_step){
 }
 
 //get all the team names for a particular event ID and pass them on to next_step
-function getTeamNames(event_id, next_step){
-    let url = "https://flltournament.com/Scoreboard.aspx?TID=" + event_id;
-
-    make_request(url, team_name_extractor, next_step);
+function getTeamNames(){
+    // 1-padding since names in schedule start by 1
+    return [
+        '', 'RoboKids', 'MINT White Bricks', 'GO ROBOT', 'Robotik AG BvSG Team 1',
+        'Die Musketiere', 'MPG Robotics', 'PaRaMeRoS', 'Lon3',
+        'MPG IT Crowd', 'RoboCats', 'MakerLab Brickies', 'RoHoKi',
+        'MPG Youngsters', 'EmileIntelligence "EI"', 'SC-DigiTrain', 'Huberts Katze',
+        'Needs No Name',  'We are ReDI', 'RoboRo', 'JFG Augsburg',
+        'Gummibärchenbande', 'MINT Green Bricks', 'Robotik AG BvSG Team 2', 'Here We GO'
+    ];
 }

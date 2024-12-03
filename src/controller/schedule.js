@@ -1,12 +1,12 @@
 const csv = require('fast-csv');
 const scraper = require('../web_scraper/web_scraper.js');
-const { remote, ipcRenderer } = require('electron');
+const { ipcRenderer} = require('electron');
 
 module.exports = {
-    parseCSV : parseCSV,
-    next_block : next_block,
-    previous_block : previous_block,
-    set_event_id : set_event_id
+    parseCSV: parseCSV,
+    next_block: next_block,
+    previous_block: previous_block,
+    set_event_id: set_event_id
 }
 
 //a global list of all the scheduled match blocks
@@ -59,8 +59,8 @@ let blocks = [];
 //the currently-selected mach block (i.e., the current or next block)
 let current_block = 0;
 
-function set_current_block(new_value){
-    if (new_value < blocks.length && new_value >= 0){
+function set_current_block(new_value) {
+    if (new_value < blocks.length && new_value >= 0) {
         current_block = new_value;
         document.querySelector("#current-match-block").innerHTML = blocks[new_value].time;
         ipcRenderer.send("current-match-block", blocks[new_value].time) // for the touch bar?
@@ -68,60 +68,59 @@ function set_current_block(new_value){
     }
 }
 
-function next_block(){
-    set_current_block(current_block+1);
+function next_block() {
+    set_current_block(current_block + 1);
 }
 
-function previous_block(){
-    set_current_block(current_block-1);
+function previous_block() {
+    set_current_block(current_block - 1);
 }
 
 let event_id = null;
 
-function set_event_id(new_id){
+function set_event_id(new_id) {
     event_id = new_id;
 }
 
 //insert the specified match into the block at the
 //specified time, creating the block if it doesn't already exist
-function addMatch(match, time){
+function addMatch(match, time) {
     let found = false;
-    for (let i=0; i<blocks.length; i++){
-        if (blocks[i].time == time){
+    for (let i = 0; i < blocks.length; i++) {
+        if (blocks[i].time == time) {
             found = true;
             blocks[i].matches.push(match);
         }
     }
-    if (!found){
+    if (!found) {
         //create a new block
         blocks.push({
-            "time" : time,
-            "matches" : [match]
+            "time": time,
+            "matches": [match]
         });
     }
 }
 
 //parse a CSV file at the specified file path and
 //populate the blocks list with all its matches
-function parseCSV(filePath){
+function parseCSV(filePath) {
     let indexes = {};
-    
+
     //clear out any existing blocks
     blocks = [];
 
     csv.parseFile(filePath).on('data', row => {
-        if (row[0] == "Date"){
+        if (row[0] == "Date") {
             // this is the title row
             indexes.time = row.indexOf("Begin Time");
             indexes.type = row.indexOf("Type");
             indexes.round = row.indexOf("Round");
             indexes.team = row.indexOf("Team #");
             indexes.table = row.indexOf("Room");
-        }
-        else{
+        } else {
             // this is not the title row
             // is this schedule item a practice or competition match?
-            if (["Practice", "Table"].includes(row[indexes.type])){
+            if (["Practice", "Table"].includes(row[indexes.type])) {
                 //yes! add it to the appropriate block
                 let tmp = {};
                 tmp.type = row[indexes.type];
@@ -133,23 +132,21 @@ function parseCSV(filePath){
         }
     });
 
-    setTimeout(function(){
+    setTimeout(function () {
         set_current_block(0);
     }, 250);
 
-    setTimeout(function(){
-        if (event_id){
-            scraper.getTeamNames(event_id, function(names){
-                for (let i=0; i<blocks.length; i++){
-                    for(let j=0; j<blocks[i].matches.length; j++){
-                        blocks[i].matches[j].name = names[blocks[i].matches[j].team];
-                    }
-                }
-            });
+    setTimeout(function () {
+        const names = scraper.getTeamNames();
+        for (const element of blocks) {
+            for (let j = 0; j < element.matches.length; j++) {
+                console.log(element.matches[j].team, names[element.matches[j].team]);
+                element.matches[j].name = names[element.matches[j].team];
+            }
         }
     }, 250);
 
-    setTimeout(function(){
+    setTimeout(function () {
         ipcRenderer.send("set-blocks", blocks);
     }, 1000);
 }
