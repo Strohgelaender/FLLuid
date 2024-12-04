@@ -1,4 +1,4 @@
-class Scrollable{
+class Scrollable {
     _current_scroll = 1;
     _updating = null;
     _last_time = null;
@@ -17,7 +17,7 @@ class Scrollable{
      * @param {HTMLElement} display - The HTML element where the scrolling display will be shown
      * @param {Object} options - Display configuration options
      */
-    constructor(display, options={}){
+    constructor(display, options = {}) {
         //initialize options
         this.display = display;
 
@@ -37,14 +37,14 @@ class Scrollable{
      * Update the specified options
      * @param {Object} options
      */
-    updateOptions(options, start=true){
+    updateOptions(options, start = true) {
         this.speed = options.hasOwnProperty("speed") ? options.speed : this.speed;
         this.fps = options.hasOwnProperty("fps") ? options.fps : this.fps;
         this.extraClasses = options.hasOwnProperty("extraClasses") ? options.extraClasses : this.extraClasses;
         this.showStickyHeaders = options.hasOwnProperty("showStickyHeaders") ? options.showStickyHeaders : this.showStickyHeaders;
 
         // this._updateStickyHeaders();
-        if (start){
+        if (start) {
             this.start();
         }
     }
@@ -54,9 +54,9 @@ class Scrollable{
      * @param {String[]} content - 2D Array representing the table content
      * @param {Boolean} useHeaders - Treat first row of table as headers
      */
-    setTable(content, useHeaders=true){
+    setTable(content, useHeaders = true) {
         this._table = this._generateTable(content, useHeaders);
-        if (this.scrollable_container.childElementCount == 0 && this._table != null){
+        if (this.scrollable_container.childElementCount == 0 && this._table != null) {
             this.scrollable_container.appendChild(this._table.cloneNode(true));
         }
     }
@@ -65,7 +65,7 @@ class Scrollable{
      * Set images to be displayed between instances of the table
      * @param {Array} imgs - Array of file paths to images
      */
-    setImages(imgs){
+    setImages(imgs) {
         this.image_files = imgs
     }
 
@@ -73,9 +73,9 @@ class Scrollable{
      * Get the path of the next image to display
      * @returns {String}
      */
-    _getNextImage(){
+    _getNextImage() {
         this._current_img += 1;
-        if (this._current_img >= this.image_files.length){
+        if (this._current_img >= this.image_files.length) {
             this._current_img = 0;
         }
         return this.image_files[this._current_img];
@@ -84,11 +84,11 @@ class Scrollable{
     /**
      * Start scrolling
      */
-    start(){
+    start() {
 
         this._last_time = Date.now();
         this.stop();
-        this._updating = setInterval(this._advanceScroll.bind(this), 1000/this.fps);
+        this._updating = setInterval(this._advanceScroll.bind(this), 1000 / this.fps);
         this._updateStickyHeaders();
 
         this._table.className = `scrollable-table ${this.extraClasses}`;
@@ -97,7 +97,7 @@ class Scrollable{
     /**
      * Stop scrolling
      */
-    stop(){
+    stop() {
         clearInterval(this._updating);
     }
 
@@ -107,7 +107,7 @@ class Scrollable{
      * @param {Boolean} useHeaders
      * @returns {HTMLElement}
      */
-    _generateTable(content, useHeaders){
+    _generateTable(content, useHeaders) {
         let parser = new DOMParser();
         let doc = parser.parseFromString("", "text/html");
         let table = doc.createElement("table");
@@ -116,7 +116,7 @@ class Scrollable{
         if (content == []) return null;
 
         // add first row as header (if applicable)
-        if (useHeaders){
+        if (useHeaders) {
             let thead = doc.createElement("thead");
             let row = doc.createElement("tr");
             content[0].forEach(cell => {
@@ -130,13 +130,14 @@ class Scrollable{
 
         //add subsequent rows
         let tbody = doc.createElement("tbody");
-        content.slice(useHeaders?1:0, content.length+1).forEach(input_row => {
+        content.slice(useHeaders ? 1 : 0, content.length + 1).forEach(input_row => {
             let table_row = doc.createElement("tr");
             input_row.forEach(cell => {
                 let tmp = doc.createElement("td");
                 tmp.innerHTML = `<div>${cell}</div>`;
                 table_row.append(tmp);
             });
+            // TODO add highlight row logic
             tbody.append(table_row);
         });
         table.append(tbody);
@@ -147,11 +148,11 @@ class Scrollable{
     /**
      * Advance the scrolling by the appropriate amount. Called once per frame.
      */
-    _advanceScroll(){
+    _advanceScroll() {
         //update the position of the table
         let now = Date.now();
         let time_elapsed = now - this._last_time;
-        let amt_to_scroll = time_elapsed * this.speed/1000;
+        let amt_to_scroll = time_elapsed * this.speed / 1000;
         this._current_scroll += amt_to_scroll;
         this._last_time = now;
 
@@ -191,9 +192,9 @@ class Scrollable{
     /**
      * Update the "sticky headers" at the top of the table
      */
-    _updateStickyHeaders(){
-        if (this.scrollable_container){
-            if (this.showStickyHeaders){
+    _updateStickyHeaders() {
+        if (this.scrollable_container) {
+            if (this.showStickyHeaders) {
                 //create the table header element
                 let header = document.createElement("table");
                 header.className = `scrollable-sticky-header ${this.extraClasses}`;
@@ -212,14 +213,13 @@ class Scrollable{
                 header.append(header_row);
 
                 this.sticky_headers_area.innerHTML = header.outerHTML;
-            }
-            else{
+            } else {
                 this.sticky_headers_area.innerHTML = "";
             }
         }
     }
 }
 
-if (typeof module != 'undefined'){
+if (typeof module != 'undefined') {
     module.exports = Scrollable;
 }

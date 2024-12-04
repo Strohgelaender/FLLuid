@@ -7,7 +7,7 @@ var display_state = {};
 
 // TODO highlight current match, remove old matches
 
-function array_cmp(a1, a2){
+function array_cmp(a1, a2) {
     return JSON.stringify(a1) === JSON.stringify(a2);
 }
 
@@ -16,12 +16,16 @@ socket.on("set-state", newState => {
     display_state = JSON.parse(newState);
 
     if (!array_cmp(old_state.match_blocks, display_state.match_blocks) ||
-        (old_state.current_block != display_state.current_block)){
-        let tmp = [["Uhrzeit", "Team", "Tisch", "Runde"]];
+        (old_state.current_block !== display_state.current_block)) {
+        const tmp = [["Uhrzeit", "Team", "Tisch", "Runde"]];
+        const currentBlock = display_state.match_blocks[display_state.current_block];
+        const currentRound = currentBlock.matches[0].round;
         display_state.match_blocks.forEach((block, idx) => {
-            if (idx >= display_state.current_block){
+            if (idx >= display_state.current_block) {
                 block.matches.forEach(match => {
-                    tmp.push([block.time, match.name, match.table, match.type === 'Practice' ? 'TR': match.round]);
+                    if (match.round <= +currentRound + 1) {
+                        tmp.push([block.time, match.name, match.table, match.type === 'Practice' ? 'TR' : match.round]);
+                    }
                 });
             }
         });
@@ -30,19 +34,19 @@ socket.on("set-state", newState => {
         schedule_table.start();
     }
 
-    if (old_state.images != display_state.images){
+    if (old_state.images != display_state.images) {
         schedule_table.setImages(display_state.images);
     }
 
-    if (old_state.message != display_state.message){
+    if (old_state.message != display_state.message) {
         document.querySelector("#message-area").innerHTML = display_state.message;
     }
 
-    if (old_state.show_message_on_tables != display_state.show_message_on_tables){
+    if (old_state.show_message_on_tables != display_state.show_message_on_tables) {
         document.querySelector("#message-wrapper").style.display = display_state.show_message_on_tables ? "block" : "none";
     }
 
-    if (old_state.scroll_speed != display_state.scroll_speed){
+    if (old_state.scroll_speed != display_state.scroll_speed) {
         schedule_table.updateOptions({speed: display_state.scroll_speed});
         console.log("speed");
     }
@@ -52,7 +56,7 @@ var schedule_table;
 window.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(location.search);
     let dark = false;
-    if (urlParams.get("dark") >= 1){
+    if (urlParams.get("dark") >= 1) {
         // dark mode
         dark = true;
         document.querySelector("body").classList.add("dark");
@@ -62,7 +66,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     schedule_table = new Scrollable(
         document.querySelector("#schedule-display-area"),
-        {"extraClasses" : `table table-striped table-borderless ${dark ? "table-dark" : ""}`}
+        {"extraClasses": `table table-striped table-borderless ${dark ? "table-dark" : ""}`}
     );
 
 });
