@@ -53,9 +53,10 @@ class Scrollable {
      * Set the content of the display
      * @param {String[]} content - 2D Array representing the table content
      * @param {Boolean} useHeaders - Treat first row of table as headers
+     * @param {Function} highlightFunction - Function to determine if a row should be highlighted
      */
-    setTable(content, useHeaders = true) {
-        this._table = this._generateTable(content, useHeaders);
+    setTable(content, useHeaders = true, highlightFunction = undefined) {
+        this._table = this._generateTable(content, useHeaders, highlightFunction);
         if (this.scrollable_container.childElementCount == 0 && this._table != null) {
             this.scrollable_container.appendChild(this._table.cloneNode(true));
         }
@@ -107,7 +108,7 @@ class Scrollable {
      * @param {Boolean} useHeaders
      * @returns {HTMLElement}
      */
-    _generateTable(content, useHeaders) {
+    _generateTable(content, useHeaders, highlightFunction) {
         let parser = new DOMParser();
         let doc = parser.parseFromString("", "text/html");
         let table = doc.createElement("table");
@@ -137,7 +138,9 @@ class Scrollable {
                 tmp.innerHTML = `<div>${cell}</div>`;
                 table_row.append(tmp);
             });
-            // TODO add highlight row logic
+            if (highlightFunction && highlightFunction(input_row)) {
+                table_row.classList.add("highlight");
+            }
             tbody.append(table_row);
         });
         table.append(tbody);

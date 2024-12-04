@@ -30,7 +30,9 @@ socket.on("set-state", newState => {
             }
         });
         console.log(tmp);
-        schedule_table.setTable(tmp);
+        schedule_table.setTable(tmp, true, (row) => {
+            return row[0] === currentBlock.time;
+        });
         schedule_table.start();
     }
 
